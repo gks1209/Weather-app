@@ -12,20 +12,25 @@ export default function App() {
   const [days, setDays] = useState([]);
   const [ok, setOk] = useState(true);
   const getWeather = async() => {
+    //위치 권한 요청
     const {granted} = await Location.requestForegroundPermissionsAsync();
       if(!granted){
         setOk(false);  
       }
+
+    //현재 위치 가져오기
     const {coords:{latitude, longitude}} = await Location.getCurrentPositionAsync({accuracy:5});
     const location = await Location.reverseGeocodeAsync(
       {latitude, longitude}, 
       {useGoogleMaps:false}
     );
     setCity(location[0].city);
+
+    //날씨 데이터 요청
     const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&units=metric&appid=${API_KEY}`) //https://api.openweathermap.org/data/2.5/weather?q=Incheon&appid=f7c2db316ec3566e622a85ccbc04c81c
     const json = await response.json(); 
 
-    console.log(json); //응답 전체를 콘솔에 출력하여 확인 (오류확인)
+    console.log(json); //전체 응답 로그 출력
 
     if (Array.isArray(json.daily)) { //응답이 배열인지 확인
       setDays(json.daily);
